@@ -1,28 +1,34 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-
-//stuff I might be able to delete later 
 const path = require('path');
-
-//const routes = require('./routes');
-
-
-// ---------------Apolo stuff ----------------------
+const { authMiddleware } = require('./utils/auth');
 
 // Import the two parts of a GraphQL schema
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 
+// creating port and settin gup express with ApolloServer
 const PORT = process.env.PORT || 3001;
+const app = express();
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: authMiddleware,
 });
-
-const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// is this stuff used to set up for Heroku?
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/build')));
+}
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
+
 
 // Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async (typeDefs, resolvers) => {
