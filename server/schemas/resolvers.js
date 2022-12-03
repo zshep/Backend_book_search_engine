@@ -36,7 +36,7 @@ const resolvers = {
             return //Auth type
         },
         //look into input type to handle lots of parameters
-        saveBooks: async (parent, { input })=> {
+        saveBook: async (parent, { input })=> {
 
             return //user type
         },
